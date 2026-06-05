@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Softspring\Component\FormSchema\Schema;
 
 use Symfony\Component\Form\FormInterface;

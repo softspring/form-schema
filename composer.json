@@ -1,11 +1,14 @@
 {
     "name": "softspring/form-schema",
-    "description": "Extracts schema from a Symfony form",
+    "description": "Extracts JSON-schema-like metadata from Symfony forms",
     "license": "AGPL-3.0-or-later",
     "type": "component",
     "require": {
         "php": ">=8.4",
+        "symfony/config": "^6.4 || ^7.4 || ^8.0",
+        "symfony/dependency-injection": "^6.4 || ^7.4 || ^8.0",
         "symfony/form": "^6.4.24 || ^7.4 || ^8.0",
+        "symfony/http-kernel": "^6.4 || ^7.4 || ^8.0",
         "symfony/validator": "^6.4.24 || ^7.4 || ^8.0"
     },
     "require-dev": {
@@ -13,7 +16,8 @@
         "friendsofphp/php-cs-fixer": "^3.94",
         "phpstan/phpstan": "^2.1",
         "phpunit/phpunit": "^12.5",
-        "rector/rector": "^2.3"
+        "rector/rector": "^2.3",
+        "symfony/yaml": "^6.4 || ^7.4 || ^8.0"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
@@ -41,7 +45,7 @@
     "scripts": {
         "fix": [
             "vendor/bin/rector process src tests",
-            "vendor/bin/php-cs-fixer fix",
+            "vendor/bin/php-cs-fixer fix --sequential",
             "composer normalize"
         ],
         "run-tests": [
@@ -49,10 +53,9 @@
             "XDEBUG_MODE=coverage vendor/bin/phpunit",
             "vendor/bin/rector process src tests --dry-run",
             "vendor/bin/phpstan analyse src tests --level 5",
-            "vendor/bin/php-cs-fixer fix --dry-run --diff",
+            "vendor/bin/php-cs-fixer fix --dry-run --diff --sequential",
             "vendor/bin/yaml-lint .github/ -vvv --parse-tags",
-            "vendor/bin/yaml-lint config/ -vvv --parse-tags",
-            "vendor/bin/yaml-lint translations/ -vvv --parse-tags"
+            "vendor/bin/yaml-lint config/ -vvv --parse-tags"
         ],
         "test": [
             "composer update --no-scripts --ansi",

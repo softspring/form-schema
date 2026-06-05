@@ -3,13 +3,13 @@
 namespace Softspring\Component\FormSchema\Tests\Schema;
 
 use PHPUnit\Framework\TestCase;
-use Softspring\Component\FormSchema\Schema\SchemaExtractor;
-use Softspring\Component\FormSchema\Schema\SchemaMetadataApplier;
 use Softspring\Component\FormSchema\Schema\Extractor\ButtonFieldSchemaExtractor;
 use Softspring\Component\FormSchema\Schema\Extractor\CollectionFieldSchemaExtractor;
 use Softspring\Component\FormSchema\Schema\Extractor\CompoundFieldSchemaExtractor;
 use Softspring\Component\FormSchema\Schema\Extractor\OverrideFieldSchemaExtractor;
 use Softspring\Component\FormSchema\Schema\Extractor\ScalarFieldSchemaExtractor;
+use Softspring\Component\FormSchema\Schema\SchemaExtractor;
+use Softspring\Component\FormSchema\Schema\SchemaMetadataApplier;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -19,6 +19,7 @@ use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Count;
@@ -176,7 +177,7 @@ class SchemaExtractorTest extends TestCase
 
 class ExampleFormType extends AbstractType
 {
-    public function buildForm(\Symfony\Component\Form\FormBuilderInterface $builder, array $options): void
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('name', TextType::class)
@@ -199,7 +200,7 @@ class ExampleFormType extends AbstractType
 
 class ExampleJsonSchemeFormType extends AbstractType
 {
-    public function buildForm(\Symfony\Component\Form\FormBuilderInterface $builder, array $options): void
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('payload', JsonSchemeTextType::class, [
             'json_scheme' => [
@@ -215,7 +216,7 @@ class ExampleJsonSchemeFormType extends AbstractType
 
 class ExampleButtonFormType extends AbstractType
 {
-    public function buildForm(\Symfony\Component\Form\FormBuilderInterface $builder, array $options): void
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('title', TextType::class)
@@ -225,7 +226,7 @@ class ExampleButtonFormType extends AbstractType
 
 class ExampleChoiceFormType extends AbstractType
 {
-    public function buildForm(\Symfony\Component\Form\FormBuilderInterface $builder, array $options): void
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('status', ChoiceType::class, [
@@ -260,7 +261,7 @@ class ExampleChoiceFormType extends AbstractType
 
 class ExampleConstraintFormType extends AbstractType
 {
-    public function buildForm(\Symfony\Component\Form\FormBuilderInterface $builder, array $options): void
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('headline', TextType::class, [
