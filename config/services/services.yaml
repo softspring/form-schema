@@ -1,0 +1,18 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: false
+
+    Softspring\Component\FormSchema\Schema\:
+        resource: '../../src/Schema/*'
+        exclude:
+            - '../../src/Schema/Extractor/*'
+
+    Softspring\Component\FormSchema\Schema\Extractor\:
+        resource: '../../src/Schema/Extractor/*'
+        tags: [ 'softspring.form_schema.field_extractor' ]
+
+    Softspring\Component\FormSchema\Schema\SchemaExtractor:
+        arguments:
+            $fieldExtractors: !tagged_iterator { tag: 'softspring.form_schema.field_extractor' }
