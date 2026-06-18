@@ -6,7 +6,7 @@
 [![PHP Version](https://img.shields.io/packagist/dependency-v/softspring/form-schema/php?style=flat-square)](https://github.com/softspring/form-schema/blob/6.0/composer.json)
 [![Downloads](https://img.shields.io/packagist/dt/softspring/form-schema?style=flat-square)](https://packagist.org/packages/softspring/form-schema)
 [![CI](https://img.shields.io/github/actions/workflow/status/softspring/form-schema/ci.yml?branch=6.0&style=flat-square&label=CI)](https://github.com/softspring/form-schema/actions/workflows/ci.yml)
-[![Coverage](https://img.shields.io/codecov/c/github/softspring/form-schema?branch=6.0&style=flat-square)](https://codecov.io/gh/softspring/form-schema)
+[![Coverage](https://img.shields.io/codecov/c/github/softspring/form-schema?branch=6.0&style=flat-square)](https://app.codecov.io/gh/softspring/form-schema/tree/6.0)
 
 `softspring/form-schema` extracts JSON-schema-like metadata from Symfony forms.
 
