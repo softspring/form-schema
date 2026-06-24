@@ -10,20 +10,32 @@ use Softspring\Component\FormSchema\Schema\Extractor\OverrideFieldSchemaExtracto
 use Softspring\Component\FormSchema\Schema\Extractor\ScalarFieldSchemaExtractor;
 use Softspring\Component\FormSchema\Schema\SchemaExtractor;
 use Softspring\Component\FormSchema\Schema\SchemaMetadataApplier;
+use stdClass;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\TimeType;
+use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Validator\Constraints\Count;
+use Symfony\Component\Validator\Constraints\GreaterThan;
+use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\LessThan;
+use Symfony\Component\Validator\Constraints\LessThanOrEqual;
 use Symfony\Component\Validator\Constraints\Range;
 use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Component\Validator\Validation;
@@ -158,6 +170,54 @@ class SchemaExtractorTest extends TestCase
         ], $schema);
     }
 
+    public function testExtractsScalarFormatsDefaultsAndAdditionalConstraints(): void
+    {
+        $extractor = $this->createExtractor();
+        $schema = $extractor->extract(ExampleScalarMetadataFormType::class);
+
+        self::assertSame([
+            'type' => 'object',
+            'properties' => [
+                'email' => [
+                    'type' => 'string',
+                    'format' => 'email',
+                    'default' => 'support@example.com',
+                ],
+                'website' => [
+                    'type' => 'string',
+                    'format' => 'uri',
+                ],
+                'startsAt' => [
+                    'type' => 'string',
+                    'format' => 'date-time',
+                ],
+                'birthDate' => [
+                    'type' => 'string',
+                    'format' => 'date',
+                ],
+                'startsAtTime' => [
+                    'type' => 'string',
+                    'format' => 'time',
+                ],
+                'price' => [
+                    'type' => 'number',
+                    'exclusiveMinimum' => 0,
+                    'minimum' => 1,
+                    'exclusiveMaximum' => 100,
+                    'maximum' => 99,
+                ],
+                'level' => [
+                    'type' => 'integer',
+                    'enum' => [1, 2, 3],
+                ],
+                'ignoredChoices' => [
+                    'type' => 'string',
+                ],
+            ],
+            'required' => ['email', 'website', 'startsAt', 'birthDate', 'startsAtTime', 'price', 'level', 'ignoredChoices'],
+        ], $schema);
+    }
+
     protected function createExtractor($formFactory = null): SchemaExtractor
     {
         $formFactory ??= Forms::createFormFactoryBuilder()
@@ -282,6 +342,46 @@ class ExampleConstraintFormType extends AbstractType
                 'entry_type' => TextType::class,
                 'constraints' => [
                     new Count(min: 1, max: 3),
+                ],
+            ])
+        ;
+    }
+}
+
+class ExampleScalarMetadataFormType extends AbstractType
+{
+    public function buildForm(FormBuilderInterface $builder, array $options): void
+    {
+        $builder
+            ->add('email', EmailType::class, [
+                'empty_data' => 'support@example.com',
+            ])
+            ->add('website', UrlType::class)
+            ->add('startsAt', DateTimeType::class, [
+                'widget' => 'single_text',
+            ])
+            ->add('birthDate', DateType::class, [
+                'widget' => 'single_text',
+            ])
+            ->add('startsAtTime', TimeType::class, [
+                'widget' => 'single_text',
+            ])
+            ->add('price', NumberType::class, [
+                'constraints' => [
+                    new GreaterThan(0),
+                    new GreaterThanOrEqual(1),
+                    new LessThan(100),
+                    new LessThanOrEqual(99),
+                ],
+            ])
+            ->add('level', IntegerType::class, [
+                'constraints' => [
+                    new Choice(choices: [1, 2, 3]),
+                ],
+            ])
+            ->add('ignoredChoices', TextType::class, [
+                'constraints' => [
+                    new Choice(choices: [new stdClass()]),
                 ],
             ])
         ;
