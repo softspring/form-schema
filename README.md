@@ -14,7 +14,7 @@ This package is still in active development. Its public API, extracted schema sh
 
 ## Documentation
 
-Read the [experimental form-schema guide](https://armonic.softspring.es/6.1@dev/docs/components/form-schema).
+Read the [experimental form-schema guide](https://armonic.softspring.es/6.1@dev/components/form-schema).
 
 ## Features
 
