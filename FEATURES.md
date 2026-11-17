@@ -14,7 +14,8 @@ This package is in active development. The functional scope is useful for experi
 - Mark required fields from Symfony form configuration.
 - Extract scalar field types such as string, integer, number, boolean, and email.
 - Extract choices as enum values when choices are scalar.
-- Extract collection fields as array schemas.
+- Extract collection fields, including derived types, as array schemas using their resolved prototypes when available.
+- Describe expanded and inherited choice fields with their submitted values instead of checkbox child fields.
 - Extract compound fields as nested object schemas.
 - Skip button fields.
 - Read explicit schema overrides through `json_schema` and legacy `json_scheme` options.

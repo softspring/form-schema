@@ -4,6 +4,7 @@ namespace Softspring\Component\FormSchema\Tests\Schema;
 
 use PHPUnit\Framework\TestCase;
 use Softspring\Component\FormSchema\Schema\Extractor\ButtonFieldSchemaExtractor;
+use Softspring\Component\FormSchema\Schema\Extractor\ChoiceFieldSchemaExtractor;
 use Softspring\Component\FormSchema\Schema\Extractor\CollectionFieldSchemaExtractor;
 use Softspring\Component\FormSchema\Schema\Extractor\CompoundFieldSchemaExtractor;
 use Softspring\Component\FormSchema\Schema\Extractor\OverrideFieldSchemaExtractor;
@@ -42,6 +43,28 @@ use Symfony\Component\Validator\Validation;
 
 class SchemaExtractorTest extends TestCase
 {
+    public function testInheritedExpandedChoicesDescribeSubmittedValuesInsteadOfCheckboxChildren(): void
+    {
+        $factory = Forms::createFormFactory();
+        $form = $factory->createBuilder()->add('status', DerivedChoiceType::class, [
+            'choices' => ['Draft' => 'draft', 'Published' => 'published'],
+            'choice_value' => static fn (?string $value): string => null === $value ? '' : 'id-'.$value,
+            'multiple' => true, 'expanded' => true,
+        ])->getForm();
+        $schema = $this->createExtractor()->extract($form);
+        self::assertSame(['type' => 'array', 'items' => ['type' => 'string', 'enum' => ['id-draft', 'id-published']]], $schema['properties']['status']);
+    }
+
+    public function testInheritedCollectionsKeepTheirResolvedPrototype(): void
+    {
+        $factory = Forms::createFormFactory();
+        $form = $factory->createBuilder()->add('items', DerivedCollectionType::class, [
+            'entry_type' => TextType::class, 'allow_add' => true, 'prototype_options' => ['label' => 'Resolved prototype'],
+        ])->getForm();
+        $schema = $this->createExtractor()->extract($form);
+        self::assertSame(['type' => 'array', 'items' => ['type' => 'string', 'title' => 'Resolved prototype']], $schema['properties']['items']);
+    }
+
     public function testExtractsJsonSchemaFromSymfonyFieldTypes(): void
     {
         $extractor = $this->createExtractor();
@@ -228,6 +251,7 @@ class SchemaExtractorTest extends TestCase
         return new SchemaExtractor($formFactory, [
             new OverrideFieldSchemaExtractor(),
             new ButtonFieldSchemaExtractor(),
+            new ChoiceFieldSchemaExtractor($metadataApplier),
             new CollectionFieldSchemaExtractor($metadataApplier),
             new CompoundFieldSchemaExtractor($metadataApplier),
             new ScalarFieldSchemaExtractor($metadataApplier),
@@ -413,5 +437,21 @@ class JsonSchemeTextType extends AbstractType
     {
         $resolver->setDefined('json_scheme');
         $resolver->setAllowedTypes('json_scheme', ['array', 'null']);
+    }
+}
+
+class DerivedChoiceType extends AbstractType
+{
+    public function getParent(): string
+    {
+        return ChoiceType::class;
+    }
+}
+
+class DerivedCollectionType extends AbstractType
+{
+    public function getParent(): string
+    {
+        return CollectionType::class;
     }
 }
