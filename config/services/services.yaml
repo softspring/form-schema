@@ -16,3 +16,9 @@ services:
     Softspring\Component\FormSchema\Schema\SchemaExtractor:
         arguments:
             $fieldExtractors: !tagged_iterator { tag: 'softspring.form_schema.field_extractor' }
+
+    Softspring\Component\FormSchema\Schema\Extractor\ChoiceFieldSchemaExtractor:
+        tags: [{ name: 'softspring.form_schema.field_extractor', priority: 100 }]
+
+    Softspring\Component\FormSchema\Schema\Extractor\OverrideFieldSchemaExtractor:
+        tags: [{ name: 'softspring.form_schema.field_extractor', priority: 300 }]

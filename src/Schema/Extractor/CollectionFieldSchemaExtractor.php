@@ -7,6 +7,7 @@ use Softspring\Component\FormSchema\Schema\SchemaMetadataApplier;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\ResolvedFormTypeInterface;
 
 class CollectionFieldSchemaExtractor implements FieldSchemaExtractorInterface
 {
@@ -17,7 +18,13 @@ class CollectionFieldSchemaExtractor implements FieldSchemaExtractorInterface
 
     public function supports(FormInterface $field): bool
     {
-        return CollectionType::class === $field->getConfig()->getType()->getInnerType()::class;
+        for ($type = $field->getConfig()->getType(); $type instanceof ResolvedFormTypeInterface; $type = $type->getParent()) {
+            if ($type->getInnerType() instanceof CollectionType) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function extract(FormInterface $field, SchemaExtractor $schemaExtractor): ?array
@@ -26,7 +33,14 @@ class CollectionFieldSchemaExtractor implements FieldSchemaExtractorInterface
         $entryType = $options['entry_type'] ?? FormType::class;
         $entryOptions = $options['entry_options'] ?? [];
 
-        $entryForm = $field->getConfig()->getFormFactory()->createNamed('__entry__', $entryType, null, $entryOptions);
+        $entryForm = $field->getConfig()->getAttribute('prototype');
+        if (!$entryForm instanceof FormInterface) {
+            $children = $field->all();
+            $entryForm = [] !== $children ? reset($children) : null;
+        }
+        if (!$entryForm instanceof FormInterface) {
+            $entryForm = $field->getConfig()->getFormFactory()->createNamed('__entry__', $entryType, null, $entryOptions);
+        }
 
         $schema = [
             'type' => 'array',
